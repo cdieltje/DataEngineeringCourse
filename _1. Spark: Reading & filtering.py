@@ -1,6 +1,6 @@
 # Databricks notebook source
 # Restart Kernel
-# dbutils.library.restartPython() # run this code in the notebook without restarting the cluster or using pip install again.
+# dbutils.library.restartPython() # run this code in the notebook without restarting the cluster or using pip install again
 
 # COMMAND ----------
 
