@@ -26,9 +26,9 @@ df_orders.display() # Without '.display()' the task is done, but nothing will be
 
 # COMMAND ----------
 
-# choose only a couple of columns to put in the spark df:
-df_limited = spark.read.table("hive_metastore.sales.orders").select('OrderID', 'CustomerID')
-df_limited.display()
+# # choose only a couple of columns to put in the spark df:
+# df_limited = spark.read.table("hive_metastore.sales.orders").select('OrderID', 'CustomerID')
+# df_limited.display()
 
 # COMMAND ----------
 
@@ -63,6 +63,9 @@ df_orders_comment = df_orders.select('OrderID', 'CustomerID', 'Comments', 'Custo
 # Examples with different filter options
 print('CustomPurchaseOrderNumber > 19999')
 df_orders_comment.filter(F.col('CustomerPurchaseOrderNumber') > 19999).display() 
+
+print('CustomPurchaseOrderNumber > 19999, now with a SQL expression')
+df_orders_comment.filter("CustomerPurchaseOrderNumber > 19999").display() # same result as previous example but with SQL string expression
 
 print('CustomPurchaseOrderNumber = 19999')
 df_orders_comment.filter(F.col('CustomerPurchaseOrderNumber')== 19999).display()

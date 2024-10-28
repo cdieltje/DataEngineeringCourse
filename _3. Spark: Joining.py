@@ -10,7 +10,7 @@ from pyspark.sql import functions as F
 
 # MAGIC %md
 # MAGIC # Read Data
-# MAGIC We do it on a small selection. there's a reason.
+# MAGIC We do it on a small selection. There's a reason.
 
 # COMMAND ----------
 
