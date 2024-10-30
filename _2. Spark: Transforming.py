@@ -41,7 +41,7 @@ df_deduplicated_2.display()
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC # Adding / Dropping / Rename columns
+# MAGIC # Column transformations
 
 # COMMAND ----------
 
@@ -72,9 +72,6 @@ df_orders_bostatus.limit(5).display()
 
 # COMMAND ----------
 
-# Group data by a single column
-# df_orders.display()
-
 df_orders_salesperson = df_orders.select('OrderID', 'CustomerID', 'SalespersonPersonID', 'OrderDate')
 
 # Grouping with one aggregation
@@ -93,7 +90,7 @@ orders_salesperson_firstorderdate.orderBy(orders_salesperson_firstorderdate['Ord
 print("")
 
 # Grouping with multiple fields
-print('Goupby SalesPerson and CustomerID:') # every row in df stands for one OrderID
+print('Goupby SalesPerson and CustomerID:')
 orders_salesperson_customer = (df_orders_salesperson.groupBy('SalespersonPersonID', 'CustomerID')
                                .count()
                                .orderBy(F.col('count').desc()) # F.col is a function that converts column name from string type to Column type. It returns a column
@@ -105,7 +102,7 @@ orders_salesperson_customer.display()
 print("")
 
 # Other combinations...
-print('SalesPersons with ID higher than 20, their row count:') # every row in df stands for one OrderID
+print('SalesPersons with ID higher than 20, their row count:')
 orders_salesperson = (df_orders_salesperson.groupBy('SalespersonPersonID')
                       .count()
                       .filter(F.col('count') > 7300)
@@ -115,24 +112,18 @@ orders_salesperson.display()
 
 # COMMAND ----------
 
-# df_orders['OrderID'].nunique()
-# df_orders.agg(F.countDistinct('OrderID')).show()
-
-# COMMAND ----------
-
-'''
-CUSTOM AGGREGATIONS
-
-# define custom aggregation functions using th udf (User Defined Function) capability
-from pyspark.sql.function import udf
+# Define custom aggregation functions using th User Defined Function (udf) and DoubleType functions
 from pyspark.sql.types import DoubleType
 
-# Define a UDF
 def custom_agg_func(values_list):
 	return sum(values_list) / len(values_list) # Example: simple average
 
 udf_custom_agg = udf(custom_agg_func, DoubleType())
 
-df.groupBy("Category").agg(
-	udf_custom_agg(F.collect_list("Sales")).alias("Custom_Avg_Sales")
-).show()
+(df_orders_salesperson.groupBy('SalespersonPersonID')
+ .agg(udf_custom_agg(F.collect_list('OrderID')).alias("Average OrderID") # absurd example, but shows how to use udf
+).display())
+
+# COMMAND ----------
+
+

@@ -9,7 +9,7 @@
 
 # COMMAND ----------
 
-from pyspark.sql import functions as F
+from pyspark.sql import functions as F # 'F' is convention
 
 # COMMAND ----------
 
@@ -52,6 +52,8 @@ df_name_age.display()
 
 # MAGIC %md
 # MAGIC # Filtering
+# MAGIC
+# MAGIC Mind: Beneficial for ingestion filtering to do this via SQL (see lesson 2 & 3, see query folding)
 
 # COMMAND ----------
 
@@ -89,8 +91,8 @@ print('OrderID is one of the listed values + only show columns \'OrderID\' and \
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC #### Method chaining
-# MAGIC Show OrderID, CustomerID and Comment of the orders where the Comment starts with 'Ik'
+# MAGIC #### Exercise
+# MAGIC Show OrderID, CustomerID and Comment of the orders where the comment starts with 'Ik'
 # MAGIC
 
 # COMMAND ----------
@@ -106,4 +108,4 @@ df_orders.filter(F.col('Comments').startswith('Ik')).select('OrderID','CustomerI
 
 # COMMAND ----------
 
-# WAAR WAS IK IN MAIL => na regex-link
+
