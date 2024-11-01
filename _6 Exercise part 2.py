@@ -1,11 +1,24 @@
 # Databricks notebook source
 # MAGIC %md
+# MAGIC # Import PySpark function
+
+# COMMAND ----------
+
+from pyspark.sql import functions as F
+
+# COMMAND ----------
+
+# MAGIC %md
 # MAGIC # Read Silver
 
 # COMMAND ----------
 
 # Load cleansed data from Silver layer
-silver_df = spark.read.table("silver_table")
+silver_df = spark.read.table("silver_customer_invoice") # hive_metastore/default/silver_customer_invoice
+
+# COMMAND ----------
+
+silver_df.display()
 
 # COMMAND ----------
 

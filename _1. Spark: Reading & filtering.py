@@ -11,7 +11,7 @@
 
 # Installing Pyspark in other platforms: pip install pyspark
 
-# Import all PySpark functions in one time
+# Import all PySpark functions
 from pyspark.sql import functions as F # 'F' is convention
 
 # COMMAND ----------

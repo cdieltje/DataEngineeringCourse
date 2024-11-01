@@ -15,7 +15,6 @@ from pyspark.sql import functions as F
 
 df_orders = spark.read.table("hive_metastore.sales.orders")
 
-
 # COMMAND ----------
 
 # MAGIC %md
