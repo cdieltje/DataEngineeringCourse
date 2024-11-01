@@ -20,7 +20,8 @@ df_invoices = spark.read.table("hive_metastore.sales.invoices")
 
 # MAGIC %md
 # MAGIC # Inspect datasets
-# MAGIC e.g. by by getting summary or displaying 5 randomly choosen rows
+# MAGIC - e.g. by getting summary or by displaying 5 randomly choosen rows.
+# MAGIC - put in comment
 
 # COMMAND ----------
 
@@ -43,9 +44,9 @@ df_invoices = spark.read.table("hive_metastore.sales.invoices")
 df_customers_invoices = ((df_customers.select('CustomerID', 'CustomerName'))
                          .join(df_invoices.select('CustomerID', 'InvoiceDate', 'InvoiceID'), on='CustomerID', how='left')
                          .filter(F.col('InvoiceDate') > '2016-04-30')
-                         .orderBy('CustomerID')
+                        #  .orderBy('CustomerID')
                          )
-df_customers_invoices.display()
+# df_customers_invoices.display()
 
 # COMMAND ----------
 
@@ -55,22 +56,3 @@ df_customers_invoices.display()
 # COMMAND ----------
 
 df_customers_invoices.write.format("delta").mode("overwrite").saveAsTable("silver_customer_invoice")
-
-# COMMAND ----------
-
-
-
-# COMMAND ----------
-
-# Select only invoices since 2014
-# df_invoices1 = df_invoices.filter(F.col('InvoiceDate') > '2016-04-30')
-# df_invoices1.select('CustomerID').distinct().count()
-
-
-df_customers_invoices.select('CustomerID').distinct().count()
-# df_invoices.filter(F.col('InvoiceDate') <= 100 )
-
-# df_customers_invoices.select('InvoiceID').distinct().count()
-# df_customers_invoices.filter(F.col("InvoiceID").isNull()).distinct().count()
-# df_invoices.filter(F.col('CustomerID').isNotNull()).distinct().count()
-# df_invoices.select('CustomerID').distinct().count()
