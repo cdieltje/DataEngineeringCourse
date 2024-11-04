@@ -24,17 +24,18 @@ df_silver = spark.read.table("silver_customer_invoice") # hive_metastore/default
 # COMMAND ----------
 
 # Add new field InvoiceWeek
-df_customer_invoiceweek = silver_df.withColumn('InvoiceWeek', F.weekofyear(F.col('InvoiceDate')))
+df_customer_invoiceweek = df_silver.withColumn('InvoiceWeek', F.weekofyear(F.col('InvoiceDate')))
 
 # Df with weekly invoice count per customer and customer category
 df_customer_invoiceweek = (
     df_customer_invoiceweek.groupBy('CustomerID', 'InvoiceWeek')
     .agg({'InvoiceID': 'count'})
     .withColumnRenamed('count(InvoiceID)', 'InvoiceCount')
-    # .orderBy('CustomerID', 'InvoiceWeek')
+    .withColumn('LastUpdateTime', F.current_timestamp())
+    .orderBy('CustomerID', 'InvoiceWeek')
 )
 
-# df_customer_invoiceweek.display()
+df_customer_invoiceweek.display()
 
 # COMMAND ----------
 
@@ -43,4 +44,12 @@ df_customer_invoiceweek = (
 
 # COMMAND ----------
 
-df_customer_invoiceweek.write.format("delta").mode("overwrite").saveAsTable("gold_customer_invoiceweek")
+(df_customer_invoiceweek.write.format("delta")
+ .mode("overwrite")
+ .option("mergeSchema", "true") # prevent errors in case of schema changes 
+ .saveAsTable("gold_customer_invoiceweek")
+)
+
+# COMMAND ----------
+
+
