@@ -45,7 +45,7 @@
 # COMMAND ----------
 
 # SQLConnectionUtils is andere notebook die zelfgeschreven functies bevat
-%run "/Workspace/Shared/utils/SQLConnectionUtils" # %run => via % kan je aangeven wat in de cel moet gebeuren. Dit is CLI-taal (Command Line Interface - Databricks heeft ook CLI under the hood). %run betekent hier: run notebook die op locatie X staat.
+%run "/Workspace/Users/carlo.dieltjens@bmatix.be/DataEngineeringCourse/SQLConnectionUtils" # %run => via % kan je aangeven wat in de cel moet gebeuren. Dit is CLI (Command Line Interface - Databricks heeft CLI under the hood). %run betekent hier: run notebook die op locatie X staat.
 
 # COMMAND ----------
 

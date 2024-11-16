@@ -67,7 +67,7 @@ df_orders_comment = df_orders.select('OrderID', 'CustomerID', 'Comments', 'Custo
 
 # Examples with different filter options
 print('CustomPurchaseOrderNumber > 19999')
-df_orders_comment.filter(F.col('CustomerPurchaseOrderNumber') > 19999).display() 
+df_orders_comment.filter(F.col('CustomerPurchaseOrderNumber') > 19999).display() # Function '.col' returns a column based on a given column name
 
 print('CustomPurchaseOrderNumber > 19999, now with a SQL expression')
 df_orders_comment.filter("CustomerPurchaseOrderNumber > 19999").display() # same result as previous example but with SQL string expression
@@ -99,9 +99,6 @@ print('OrderID is one of the listed values + only show columns \'OrderID\' and \
 # MAGIC
 
 # COMMAND ----------
-
-# Same output, but second is easier to read
-df_orders.filter(F.col('Comments').startswith('Ik')).select('OrderID','CustomerID', 'Comments').display()
 
 (df_orders.filter(F.col('Comments')
                  .startswith('Ik'))

@@ -111,16 +111,16 @@ orders_salesperson.display()
 
 # COMMAND ----------
 
-# Define custom aggregation functions using th User Defined Function (udf) and DoubleType functions
+# Define custom aggregation functions using th User Defined Function (udf) and DoubleType functions = absurd example to show udf use
 from pyspark.sql.types import DoubleType
 
 def custom_agg_func(values_list):
 	return sum(values_list) / len(values_list) # Example: simple average
 
-udf_custom_agg = udf(custom_agg_func, DoubleType())
+udf_custom_agg = udf(custom_agg_func, DoubleType()) # DoubleType needed to avoid type matching error
 
 (df_orders_salesperson.groupBy('SalespersonPersonID')
- .agg(udf_custom_agg(F.collect_list('OrderID')).alias("Average OrderID") # absurd example, but shows how to use udf
+ .agg(udf_custom_agg(F.collect_list('OrderID')).alias("Average OrderID") # .collect_list after groupBy makes list of values for each group
 ).display())
 
 # COMMAND ----------

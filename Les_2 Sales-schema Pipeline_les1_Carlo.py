@@ -55,7 +55,7 @@ except:
 #----------SOLUTION----------------
 
 # work with vars for clarity during dev => parameterize a lot
-schema_to_read = 'Sales'
+schema_to_read = 'sales'
 
 # Read Information schema from table: contains amongst others all table names. standardised schema
 information_schema_query = f"(SELECT table_name FROM information_schema.tables WHERE table_schema = '{schema_to_read}') AS alias" # mind: combination double & single quotes
@@ -84,6 +84,9 @@ information_schema_df.display()
 
 # Create schema (see code in Excel)
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {schema_to_read}") # sql query therefore spark.sql => after running schema 'sales is added in databricks > SQL Editor > hive_metastore
+
+
+
 
 # Create list of table names
 table_lst = [] # start with creating empty list
@@ -132,6 +135,85 @@ for table_name in table_lst:
 # MAGIC 1/ incremental load
 # MAGIC 2/ logging of errors (tolerance) etc.
 # MAGIC 3/ making pipelines recurring 
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC # DEBUG ELS
+
+# COMMAND ----------
+
+schema_list = ['sales', 'application'] # Define schema_list here
+
+for schema_item in schema_list:
+    #read tables from schema except for table_schema sys
+    if schema_item != 'sys':
+        print(schema_item)
+        print(schema_list)
+        spark.sql(f"CREATE SCHEMA IF NOT EXISTS {schema_item}")
+        # spark.sql(f"CREATE SCHEMA IF NOT EXISTS {schema_item}")
+
+        SchemaTablesQuery = f"(SELECT table_name FROM INFORMATION_SCHEMA.tables where table_schema = '{schema_item}') AS TablesResult"
+        Tables_df = spark.read.jdbc(url=connection_string, table=SchemaTablesQuery, properties=connection_properties) 
+        display(Tables_df)
+        table_list = []
+        for row in Tables_df.collect():
+                table_list.append(row["table_name"])
+
+        #print(table_list)
+        # Voor elke tabelnaam in ons lijstje gaan we de data inladen, wegschrijven als delta table en een tabel in ons data warehouse registreren
+        # Locatie bepalen in data lake voor onze tabellen
+
+        delta_base_path = f"dbfs:/delta/{schema_item}/"
+        for table_item in table_list:
+            table_name_path = f"{delta_base_path}{table_item}"
+            print(table_name_path)
+            try:
+                spark.read.format("delta").load(table_name_path)
+                print(f"Table {table_item} in Schema {schema_item} already exists")
+            except Exception as e:
+                print(f"Table {table_item} in Schema {schema_item} does not exist yet. Proceeding with Data Extraction")
+                CreateTablesQuery = f"(SELECT * FROM {schema_item}.{table_item}) AS CreateTablesQuery"
+                df_data = spark.read.jdbc(url=connection_string, table=CreateTablesQuery, properties=connection_properties)
+                df_data.write.format("delta").mode("overwrite").save(table_name_path)
+                spark.sql(f"CREATE TABLE IF NOT EXISTS {schema_item}.{table_item} USING DELTA LOCATION '{table_name_path}'")
+                print(f"Error loading table {table_item} in Schema {schema_item}: {e}")
+
+
+
+# COMMAND ----------
+
+for schema_item in schema_list:
+    #read tables from schema except for table_schema sys
+    if schema_item != 'sys':
+        print(schema_item)
+        spark.sql(f"CREATE SCHEMA IF NOT EXISTS {schema_item}")
+        SchemaTablesQuery = f"(SELECT table_name FROM INFORMATION_SCHEMA.tables where table_schema = '{schema_item}') AS TablesResult"
+        Tables_df = spark.read.jdbc(url=connection_string, table=SchemaTablesQuery, properties=connection_properties) 
+        display(Tables_df)
+        table_list = []
+        for row in Tables_df.collect():
+                table_list.append(row["table_name"])
+
+        #print(table_list)
+        # Voor elke tabelnaam in ons lijstje gaan we de data inladen, wegschrijven als delta table en een tabel in ons data warehouse registreren
+        # Locatie bepalen in data lake voor onze tabellen
+
+        delta_base_path = f"dbfs:/delta/{schema_item}/"
+        for table_item in table_list:
+            table_name_path = f"{delta_base_path}{table_item}"
+            print(table_name_path)
+            try:
+                spark.read.format("delta").load(table_name_path)
+                print(f"Table {table_item} in Schema {schema_item} already exists")
+            except Exception as e:
+                print(f"Table {table_item} in Schema {schema_item} does not exist yet. Proceeding with Data Extraction")
+                CreateTablesQuery = f"(SELECT * FROM {schema_item}.{table_item}) AS CreateTablesQuery"
+                df_data = spark.read.jdbc(url=connection_string, table=CreateTablesQuery, properties=connection_properties)
+                df_data.write.format("delta").mode("overwrite").save(table_name_path)
+                spark.sql = (f"(CREATE TABLE {table_item} IF NOT EXISTS {schema_item}.{table_item} USING DELTA LOCATION '{table_name_path}'")
+                print(f"Error loading table {table_item} in Schema {schema_item}: {e}")
+
 
 # COMMAND ----------
 
