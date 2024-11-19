@@ -124,15 +124,4 @@ print('Lazy evaluation when filter on second df is applied inside join operation
 
 # COMMAND ----------
 
-df_orderlines1 = df_orderlines.filter(F.col('Description').startswith('USB'))
-
-print('Filter on value in second df: display rows where \'Description\' starts with \'USB\':')
-(df_orders
- .join(df_orderlines, how = "left")
- .drop(df_orderlines['OrderID'])
- .display()
-)
-
-# COMMAND ----------
-
 

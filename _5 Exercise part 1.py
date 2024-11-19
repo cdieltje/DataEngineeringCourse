@@ -50,9 +50,18 @@ df_customers_invoices = ((df_customers.select('CustomerID', 'CustomerName'))
 
 # COMMAND ----------
 
+# Get only first 50 rows
+df_customers_invoices = df_customers_invoices.limit(50)
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC # Write to Silver layer as a Delta table
 
 # COMMAND ----------
 
 df_customers_invoices.write.format("delta").mode("overwrite").saveAsTable("silver_customer_invoice")
+
+# COMMAND ----------
+
+# df_customers_invoices.display()
