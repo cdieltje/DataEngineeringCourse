@@ -50,11 +50,7 @@ df_orders_orderlines.limit(3).display()
 
 # MAGIC %md
 # MAGIC ## Broadcasting
-# MAGIC (https://sparkbyexamples.com/pyspark/pyspark-broadcast-join-with-example/)
-# MAGIC - Variables are cached in serialized form and can be reused across multiple operations on the same RDD (Resilient Distributed Dataset)
-# MAGIC - By broadcasting the variables, Spark ensures that each node in the cluster has a copy of the data locally, reduces costly data transfers.
-# MAGIC - Data for each join key is available on every node
-# MAGIC - Useful if larger df is joined with smaller df, less useful for joining two larger df's (which would not fit in memory of each node)
+# MAGIC - By broadcasting variables, Spark ensures that each node in the cluster has a copy of the join key on every node, reduces costly data transfers.
 # MAGIC - PySpark SQL function
 
 # COMMAND ----------

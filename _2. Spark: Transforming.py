@@ -101,7 +101,7 @@ orders_salesperson_customer.display()
 print("")
 
 # Other combinations...
-print('SalesPersons with ID higher than 20, their row count:')
+print('SalesPersons with ID higher than 20 and their row count:')
 orders_salesperson = (df_orders_salesperson.groupBy('SalespersonPersonID')
                       .count()
                       .filter(F.col('count') > 7300)
@@ -111,7 +111,7 @@ orders_salesperson.display()
 
 # COMMAND ----------
 
-# Define custom aggregation functions using th User Defined Function (udf) and DoubleType functions = absurd example to show udf use
+# Define custom aggregation functions using User Defined Function (udf) and DoubleType functions = absurd example to show udf use
 from pyspark.sql.types import DoubleType
 
 def custom_agg_func(values_list):
