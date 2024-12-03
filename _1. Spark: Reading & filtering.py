@@ -67,7 +67,7 @@ df_orders_comment = df_orders.select('OrderID', 'CustomerID', 'Comments', 'Custo
 
 # Examples with different filter options
 print('CustomPurchaseOrderNumber > 19999')
-df_orders_comment.filter(F.col('CustomerPurchaseOrderNumber') > 19999).display() # Function '.col' returns a column based on a given column name
+df_orders_comment.filter(F.col('CustomerPurchaseOrderNumber') > 19999).display() # F.col is a function that converts column name from string type to Column type. It returns a column // '.filter' can be replaced by '.where'
 
 print('CustomPurchaseOrderNumber > 19999, now with a SQL expression')
 df_orders_comment.filter("CustomerPurchaseOrderNumber > 19999").display() # same result as previous example but with SQL string expression

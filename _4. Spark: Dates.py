@@ -15,6 +15,7 @@ from pyspark.sql import functions as F
 
 df_orders_date = (spark.read.table("hive_metastore.sales.orders")
                   .select('OrderID', 'CustomerID', 'SalespersonPersonID', 'OrderDate', 'LastEditedWhen') # select some date and timestamp columns
+                #   .limit(200)
                  )
 
 # COMMAND ----------
@@ -50,13 +51,16 @@ print('Display only rows of year 2014 and 2015:')
 print('Sort by highest year:')
 (df_orders_year.filter((F.col('Year').between(2014,2015))) # borders included
  .orderBy(F.desc('Year'))
+ .limit(5)
  .display())
 
 # COMMAND ----------
 
+# Get highest year on top - Other option
 print('The same result can be achieved via ascending = False')
 (df_orders_year.filter((F.col('Year').between(2014,2015)))
  .orderBy('Year', ascending = False)
+ .limit(5)
  .display())
 
 # COMMAND ----------
@@ -88,7 +92,7 @@ df_orders_date = df_orders_date.withColumn('Date_min_5', F.date_sub(F.col('Order
 df_orders_date.display()
 
 # Interval between dates (datediff function)
-df_orders_date.withColumn('Days_Between', F.datediff(F.col('Date_plus_5'), F.col('Date_min_5'))).display() # silly example, anyway useful function for leadtimes etc
+df_orders_date.withColumn('Days_Between', F.datediff(F.col('Date_plus_5'), F.col('Date_min_5'))).display() # silly example, anyway useful F for leadtimes etc
 
 # COMMAND ----------
 
@@ -108,12 +112,12 @@ df_orders_date.display()
 # COMMAND ----------
 
 # From string to date
-df_orders_date = df_orders_date.withColumn('OrderDateFormat', F.to_timestamp(F.col('OrderDateString'))) # OrderDateDateFormat becomes duplicate of OrderDate
-df_orders_date.display()
 
-# For timestamps => if OrderDateString would be in timestamp format:
-# df_orders_date = df_orders_date.withColumn('OrderDateDateFormat', F.to_date(F.col('OrderDateString'),'yyyy/MM/dd HH:mm:ss'))
+# df_orders_date = df_orders_date.withColumn('OrderDateFormat', F.to_timestamp(F.col('OrderDateString'))) # OrderDateDateFormat becomes duplicate of OrderDate
 # df_orders_date.display()
+
+df_orders_date = df_orders_date.withColumn('OrderDateDateFormat', F.to_date(F.col('OrderDateString'),'yyyy/MM/dd HH:mm:ss'))
+df_orders_date.display()
 
 # COMMAND ----------
 

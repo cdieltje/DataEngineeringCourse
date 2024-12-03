@@ -17,7 +17,7 @@ from pyspark.sql import functions as F
 # Read selection of two datasets (Get orders and OrderLines for OrderID <= 100)
 df_orders = (spark.read.table("hive_metastore.sales.orders")
              .filter(F.col('OrderID') <= 100 )
-             .select('OrderID', 'CustomerID')
+            #  .select('OrderID', 'CustomerID')
              )
 df_orderlines = (spark.read.table("hive_metastore.sales.orderlines")
                  .filter(F.col('OrderID') <= 100 )
@@ -25,13 +25,13 @@ df_orderlines = (spark.read.table("hive_metastore.sales.orderlines")
 )
 
 print('Display 3 rows of df_orders:')
-df_orders.limit(3).display()
+df_orders['OrderID', 'CustomerID'].limit(3).display()
 
 # COMMAND ----------
 
 df_orders_orderlines = df_orders.join(df_orderlines, on='OrderID', how='left')
 print('Display 3 rows of df_orders after join:')
-df_orders_orderlines.limit(3).display()
+df_orders_orderlines['OrderID', 'CustomerID', 'Description'].limit(3).display()
 
 # All usuals joins are supported, eg via how='inner', how='outer'
 
@@ -39,7 +39,7 @@ df_orders_orderlines.limit(3).display()
 
 # MAGIC %md
 # MAGIC # Cost
-# MAGIC Joins = costly, especially when working with distrubion.
+# MAGIC Joins = costly, especially when working with distribution.
 # MAGIC
 # MAGIC The data for each joining key may not be located on the same node and requires costly shuffling/data transfers.
 # MAGIC
@@ -51,19 +51,20 @@ df_orders_orderlines.limit(3).display()
 # MAGIC %md
 # MAGIC ## Broadcasting
 # MAGIC - By broadcasting variables, Spark ensures that each node in the cluster has a copy of the join key on every node, reduces costly data transfers.
+# MAGIC - Smaller df (=invoiceline, less columns) is broadcasted and joined with larger df (= invoices, lots of columns)
 # MAGIC - PySpark SQL function
 
 # COMMAND ----------
 
 print('No broadcast example (to compare runtinme):')
-df_orders_orderlines = df_orders.join(df_orderlines, "OrderID", "left")
+# df_orders_orderlines = df_orders.join(df_orderlines, "OrderID", "left")
 
 # More verbose:
-# df_orders_orderlines = (df_orders.join(df_orderlines,(df_orders['OrderID'] == df_orderlines['OrderID']), how = 'left')
-#                                        .drop(df_orderlines['OrderID'])
-#                                        )
+df_orders_orderlines = (df_orders.join(df_orderlines,(df_orders['OrderID'] == df_orderlines['OrderID']), how = 'left')
+                                       .drop(df_orderlines['OrderID'])
+                                       )
 
-df_orders_orderlines.limit(3).display()
+df_orders_orderlines['OrderID', 'CustomerID', 'Description'].limit(3).display()
 
 # COMMAND ----------
 
@@ -71,7 +72,7 @@ print('Broadcast example:')
 df_orders_orderlines = (df_orders.join(F.broadcast(df_orderlines),(df_orders['OrderID'] == df_orderlines['OrderID']))
                                        .drop(df_orderlines['OrderID'])
                                        )
-df_orders_orderlines.limit(3).display()
+df_orders_orderlines['OrderID', 'CustomerID', 'Description'].limit(3).display()
 
 # COMMAND ----------
 
@@ -111,7 +112,7 @@ print('Multiple combinations of joining + filtering are possible: Filter on valu
 )
 
 print('Filter on value in second df: display rows where \'Description\' starts with \'USB\':')
-print('Lazy evaluation when filter on second df is applied inside join operation. PySpark recognizes this and chooses the most efficent path = filter BEFORE join:')
+print('LAZY evaluation when filter on second df is applied inside join operation. PySpark recognizes this and chooses the most efficent path = filter BEFORE join:')
 (df_orders
  .join(df_orderlines.filter(F.col('Description').startswith('USB')), how = "left")
  .drop(df_orderlines['OrderID'])

@@ -58,7 +58,7 @@ df_customer_invoiceweek.display()
 # COMMAND ----------
 
 # Save as delta table
-(df_customer_invoiceweek.write.format("delta")
+(df_customer_invoiceweek.write.format("csv")
  .mode("overwrite")
  .option("mergeSchema", "true") # prevent errors in case of schema changes 
  .saveAsTable("gold_customer_invoiceweek")

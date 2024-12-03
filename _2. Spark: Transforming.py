@@ -22,7 +22,7 @@ df_orders = spark.read.table("hive_metastore.sales.orders")
 
 # COMMAND ----------
 
-df_orders_comments = df_orders.where(F.col("Comments").isNotNull())[['OrderID', 'Comments']] # make df where Comments field is filled in
+df_orders_comments = df_orders.filter(F.col("Comments").isNotNull())[['OrderID', 'Comments']] # make df where Comments field is filled in
 print('Dataframe with orders that are filled in:')
 df_orders_comments.display()
 
@@ -49,6 +49,8 @@ df_orders_bostatus = df_orders.select('OrderID', 'BackorderOrderID')
 print('start with dataframe with two columns:')
 df_orders_bostatus.limit(5).display()
 
+# COMMAND ----------
+
 # Add column
 print('Add column ProcessStatus with boolean value, based on BackorderOrderID:')
 df_orders_bostatus =  df_orders_bostatus.withColumn("ProcessStatus", F.col("BackorderOrderID").isNotNull())
@@ -73,7 +75,7 @@ df_orders_bostatus.limit(5).display()
 
 df_orders_salesperson = df_orders.select('OrderID', 'CustomerID', 'SalespersonPersonID', 'OrderDate')
 
-# Grouping with one aggregation
+# Grouping (with one aggregationà
 print('row count per SalesPerson = count of OrderID\' per SalesPerson:') # every row in df stands for one OrderID
 orders_salesperson = df_orders_salesperson.groupBy('SalespersonPersonID').count() # aggregation like .count needed, otherwise a groupby object is made, which you can't just display
 orders_salesperson.display()
@@ -92,12 +94,11 @@ print("")
 print('Goupby SalesPerson and CustomerID:')
 orders_salesperson_customer = (df_orders_salesperson.groupBy('SalespersonPersonID', 'CustomerID')
                                .count()
-                               .orderBy(F.col('count').desc()) # F.col is a function that converts column name from string type to Column type. It returns a column
+                               .orderBy(F.col('count').desc())
                                )
 
 # orders_salesperson_customer.orderBy(orders_salesperson_customer['count'].desc()).display()
 orders_salesperson_customer.display()
-
 print("")
 
 # Other combinations...
